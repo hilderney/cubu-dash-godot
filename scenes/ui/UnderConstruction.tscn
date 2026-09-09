@@ -1,0 +1,132 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/under_construction.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.0313726, 0.12549, 0.196078, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.305882, 0.803922, 0.768627, 1)
+content_margin_left = 20
+content_margin_top = 14
+content_margin_right = 20
+content_margin_bottom = 14
+shadow_offset = Vector2(4, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(1, 0.419608, 0.207843, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.901961, 0.427451, 1)
+content_margin_left = 20
+content_margin_top = 14
+content_margin_right = 20
+content_margin_bottom = 14
+shadow_offset = Vector2(4, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(1, 0.901961, 0.427451, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.0313726, 0.12549, 0.196078, 1)
+content_margin_left = 20
+content_margin_top = 14
+content_margin_right = 20
+content_margin_bottom = 14
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font = ExtResource("2_font")
+font_size = 28
+font_color = Color(1, 0.901961, 0.427451, 1)
+outline_size = 8
+outline_color = Color(1, 0.419608, 0.207843, 1)
+shadow_size = 4
+shadow_color = Color(0.0313726, 0.12549, 0.196078, 0.85)
+shadow_offset = Vector2(4, 4)
+
+[sub_resource type="LabelSettings" id="LabelSettings_body"]
+font = ExtResource("2_font")
+font_size = 12
+font_color = Color(0.305882, 0.803922, 0.768627, 1)
+
+[node name="UnderConstruction" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0431373, 0.113725, 0.211765, 1)
+
+[node name="Stripe" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = -100.0
+offset_top = 300.0
+offset_right = 1400.0
+offset_bottom = 380.0
+rotation = -0.0872665
+mouse_filter = 2
+color = Color(1, 0.419608, 0.207843, 0.18)
+
+[node name="Center" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -140.0
+offset_right = 360.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Center"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "MENU"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BodyLabel" type="Label" parent="Center"]
+layout_mode = 2
+text = "EM CONSTRUCAO"
+label_settings = SubResource("LabelSettings_body")
+horizontal_alignment = 1
+
+[node name="BtnBack" type="Button" parent="Center"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 0.901961, 0.427451, 1)
+theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
+theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_hover")
+text = "BACK"

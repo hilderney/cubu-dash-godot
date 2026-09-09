@@ -1,15 +1,45 @@
 extends Node
 
-## Estado global da run (fase, moedas, records).
+## Estado global da run (fase, moedas, records) + navegação de cenas.
+
+## true = build de desenvolvimento (mostra Debugger no menu).
+## Passe para false em release.
+const IS_DEV_BUILD: bool = true
+
+const SCENE_MAIN_MENU := "res://scenes/ui/MainMenu.tscn"
+const SCENE_GAME := "res://scenes/Game.tscn"
+const SCENE_UNDER_CONSTRUCTION := "res://scenes/ui/UnderConstruction.tscn"
+const SCENE_LEVEL_SELECT := "res://scenes/ui/LevelSelect.tscn"
+const SCENE_SOUND := "res://scenes/ui/UnderConstruction.tscn"
+const SCENE_GRAPHIC := "res://scenes/ui/UnderConstruction.tscn"
+const SCENE_CONTROLS := "res://scenes/ui/UnderConstruction.tscn"
+const SCENE_DEBUGGER := "res://scenes/ui/UnderConstruction.tscn"
 
 var current_world: int = 0
+var current_phase: int = 0
 var coins: int = 0
 var records: Dictionary = {}
 var is_running: bool = false
 
+## Título exibido na tela "em construção".
+var pending_screen_title: String = ""
+
 
 func change_scene(path: String) -> void:
 	get_tree().change_scene_to_file(path)
+
+
+func open_under_construction(title: String) -> void:
+	pending_screen_title = title
+	change_scene(SCENE_UNDER_CONSTRUCTION)
+
+
+func go_main_menu() -> void:
+	change_scene(SCENE_MAIN_MENU)
+
+
+func go_level_select() -> void:
+	change_scene(SCENE_LEVEL_SELECT)
 
 
 func start_run() -> void:

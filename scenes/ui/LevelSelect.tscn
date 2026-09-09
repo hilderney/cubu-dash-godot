@@ -1,0 +1,143 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/level_select.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_stage"]
+font = ExtResource("2_font")
+font_size = 22
+font_color = Color(1, 0.901961, 0.427451, 1)
+outline_size = 8
+outline_color = Color(1, 0.419608, 0.207843, 1)
+shadow_size = 4
+shadow_color = Color(0.0313726, 0.12549, 0.196078, 0.8)
+shadow_offset = Vector2(3, 3)
+
+[sub_resource type="LabelSettings" id="LabelSettings_selection"]
+font = ExtResource("2_font")
+font_size = 12
+font_color = Color(0.305882, 0.803922, 0.768627, 1)
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_offset = Vector2(2, 2)
+
+[sub_resource type="LabelSettings" id="LabelSettings_hint"]
+font = ExtResource("2_font")
+font_size = 9
+font_color = Color(1, 0.901961, 0.427451, 0.75)
+
+[node name="LevelSelect" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="BGLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Background" type="ColorRect" parent="BGLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0313726, 0.0784314, 0.14902, 1)
+
+[node name="Stripe" type="ColorRect" parent="BGLayer"]
+offset_left = -200.0
+offset_top = 80.0
+offset_right = 1500.0
+offset_bottom = 200.0
+rotation = -0.2
+mouse_filter = 2
+color = Color(1, 0.419608, 0.207843, 0.14)
+
+[node name="Stripe2" type="ColorRect" parent="BGLayer"]
+offset_left = -160.0
+offset_top = 520.0
+offset_right = 1560.0
+offset_bottom = 620.0
+rotation = 0.12
+mouse_filter = 2
+color = Color(0.305882, 0.803922, 0.768627, 0.1)
+
+[node name="Pivot" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(640, 780)
+
+[node name="RingGuide" type="Node2D" parent="Pivot"]
+unique_name_in_owner = true
+
+[node name="Carousel" type="Node2D" parent="Pivot"]
+unique_name_in_owner = true
+
+[node name="Hub" type="Node2D" parent="Pivot"]
+unique_name_in_owner = true
+
+[node name="HubCore" type="ColorRect" parent="Pivot/Hub"]
+offset_left = -28.0
+offset_top = -28.0
+offset_right = 28.0
+offset_bottom = 28.0
+pivot_offset = Vector2(28, 28)
+mouse_filter = 2
+color = Color(1, 0.419608, 0.207843, 1)
+
+[node name="HubInner" type="ColorRect" parent="Pivot/Hub"]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+pivot_offset = Vector2(16, 16)
+mouse_filter = 2
+color = Color(1, 0.901961, 0.427451, 1)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(640, 360)
+enabled = true
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="StageLabel" type="Label" parent="HUD"]
+unique_name_in_owner = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 28.0
+offset_right = 300.0
+offset_bottom = 70.0
+grow_horizontal = 2
+text = "SELECT WORLD"
+label_settings = SubResource("LabelSettings_stage")
+horizontal_alignment = 1
+
+[node name="SelectionLabel" type="Label" parent="HUD"]
+unique_name_in_owner = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -320.0
+offset_top = 78.0
+offset_right = 320.0
+offset_bottom = 140.0
+grow_horizontal = 2
+text = "1 / 12"
+label_settings = SubResource("LabelSettings_selection")
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="HUD"]
+unique_name_in_owner = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -420.0
+offset_top = -48.0
+offset_right = 420.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "← → GIRAR   ENTER CONFIRMAR   ESC VOLTAR"
+label_settings = SubResource("LabelSettings_hint")
+horizontal_alignment = 1
