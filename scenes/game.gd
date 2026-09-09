@@ -1,0 +1,51 @@
+extends Node2D
+
+## Mundo rola em direção ao player (Geometry Dash / Robot Unicorn Attack).
+## O personagem fica fixo no X; só controla pulo e dash.
+
+@export var base_scroll_speed: float = 350.0
+@export var dash_scroll_multiplier: float = 2.2
+@export var camera_look_ahead: float = 420.0
+
+@onready var player: CharacterBody2D = $Player
+@onready var world: Node2D = $World
+@onready var camera: Camera2D = $Camera2D
+
+var _scroll_speed: float = 0.0
+var _spawn_x: float = 0.0
+
+
+func _ready() -> void:
+	_scroll_speed = base_scroll_speed
+	_spawn_x = player.global_position.x
+	_lock_player_x()
+	_update_camera()
+
+	if not EventBus.player_dashed.is_connected(_on_player_dashed):
+		EventBus.player_dashed.connect(_on_player_dashed)
+
+
+func _physics_process(delta: float) -> void:
+	world.position.x -= _scroll_speed * delta
+	_lock_player_x()
+	_update_camera()
+
+
+func _lock_player_x() -> void:
+	player.global_position.x = _spawn_x
+
+
+func _update_camera() -> void:
+	camera.global_position = Vector2(
+		player.global_position.x + camera_look_ahead,
+		camera.global_position.y
+	)
+
+
+func _on_player_dashed() -> void:
+	_scroll_speed = base_scroll_speed * dash_scroll_multiplier
+	get_tree().create_timer(player.dash_duration).timeout.connect(_end_dash)
+
+
+func _end_dash() -> void:
+	_scroll_speed = base_scroll_speed

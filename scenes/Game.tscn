@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://cj571q7jq8aj8"]
+
+[ext_resource type="PackedScene" uid="uid://cj76gix147jjj" path="res://scenes/Player.tscn" id="1_ibkli"]
+[ext_resource type="Script" path="res://scenes/game.gd" id="2_game"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4yr2n"]
+size = Vector2(4000, 73)
+
+[node name="Game" type="Node2D"]
+script = ExtResource("2_game")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(640, 360)
+enabled = true
+
+[node name="Player" parent="." instance=ExtResource("1_ibkli")]
+position = Vector2(220, 579)
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="Ground_StaticBody2D" type="StaticBody2D" parent="World"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Ground_StaticBody2D"]
+position = Vector2(2000, 694)
+shape = SubResource("RectangleShape2D_4yr2n")
+debug_color = Color(0, 0.6313726, 0.43137255, 0.41960785)
+
+[node name="ColorRect" type="ColorRect" parent="World/Ground_StaticBody2D"]
+offset_left = 0.0
+offset_top = 653.0
+offset_right = 4000.0
+offset_bottom = 729.0
+color = Color(0, 0.7176471, 0.24705882, 1)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
