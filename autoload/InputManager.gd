@@ -8,7 +8,7 @@ const TOUCH_SCENE := preload("res://scenes/ui/TouchControls.tscn")
 signal scheme_changed(scheme: InputScheme.Id)
 signal bindings_changed
 
-var _scheme: InputScheme.Id = InputScheme.Id.KEYBOARD
+var _scheme: InputScheme.Id = InputFactory.default_scheme()
 var _port: InputPort
 var _bindings_by_scheme: Dictionary = {}
 var _touch_controls: CanvasLayer
@@ -37,15 +37,25 @@ func get_port() -> InputPort:
 
 
 func get_binding(action: String) -> InputBinding:
-	var scheme_map: Dictionary = _bindings_for(_scheme)
-	return scheme_map.get(action) as InputBinding
+	var list := get_bindings(action)
+	if list.is_empty():
+		return null
+	return list[0] as InputBinding
+
+
+func get_bindings(action: String) -> Array:
+	return _normalize_bindings(_bindings_for(_scheme).get(action))
 
 
 func get_binding_label(action: String) -> String:
-	var binding := get_binding(action)
-	if binding == null:
+	var names: PackedStringArray = []
+	for binding in get_bindings(action):
+		var item := binding as InputBinding
+		if item != null:
+			names.append(item.display_name())
+	if names.is_empty():
 		return "—"
-	return binding.display_name()
+	return " / ".join(names)
 
 
 func set_scheme(scheme: InputScheme.Id) -> void:
@@ -65,12 +75,17 @@ func set_binding(action: String, binding: InputBinding) -> void:
 	if binding == null or not InputActions.ALL.has(action):
 		return
 	var scheme_map: Dictionary = _bindings_for(_scheme)
+	var previous := get_bindings(action)
 	for other_action in InputActions.ALL:
-		var other := scheme_map.get(other_action) as InputBinding
-		if other_action != action and other != null and other.matches(binding):
-			scheme_map[other_action] = get_binding(action)
-			break
-	scheme_map[action] = binding
+		if other_action == action:
+			continue
+		var others := _normalize_bindings(scheme_map.get(other_action))
+		for other in others:
+			var other_binding := other as InputBinding
+			if other_binding != null and other_binding.matches(binding):
+				scheme_map[other_action] = previous.duplicate()
+				break
+	scheme_map[action] = [binding]
 	_bindings_by_scheme[InputFactory.to_id(_scheme)] = scheme_map
 	_apply_to_input_map()
 	_save_to_disk()
@@ -114,6 +129,10 @@ func is_touch_scheme() -> bool:
 	return _scheme == InputScheme.Id.TOUCH
 
 
+func sync_input_map() -> void:
+	_apply_to_input_map()
+
+
 func _ensure_actions_exist() -> void:
 	for action in InputActions.ALL:
 		if not InputMap.has_action(action):
@@ -128,18 +147,40 @@ func _apply_to_input_map() -> void:
 	for action in InputActions.ALL:
 		for mapped in InputActions.mirrored_actions(action):
 			InputMap.action_erase_events(mapped)
-		var binding := get_binding(action)
-		if binding == null or binding.kind == InputBinding.Kind.VIRTUAL:
-			continue
-		var event := binding.to_event()
-		if event == null:
-			continue
-		InputMap.action_add_event(action, event)
-		# Mouse already clicks Control widgets; putting it on ui_accept would double-fire menus.
-		var mirrored := InputActions.ui_mirror(action)
-		if mirrored.is_empty() or binding.kind == InputBinding.Kind.MOUSE_BUTTON:
-			continue
-		InputMap.action_add_event(mirrored, event.duplicate(true))
+	# Selected scheme is exclusive for play. Keyboard stays on UI so menus
+	# and Control Settings can always be driven with keys (and mouse clicks).
+	_apply_scheme_bindings(_scheme, true, true)
+	_apply_scheme_bindings(InputScheme.Id.KEYBOARD, not _is_play_exclusive(), true)
+	if not _is_play_exclusive():
+		_apply_scheme_bindings(InputScheme.Id.MIX, false, true)
+
+
+func _is_play_exclusive() -> bool:
+	return GameManager.is_running
+
+
+func _apply_scheme_bindings(scheme: InputScheme.Id, to_gameplay: bool, to_ui: bool) -> void:
+	for action in InputActions.ALL:
+		for binding in _normalize_bindings(_bindings_for(scheme).get(action)):
+			var item := binding as InputBinding
+			if item == null or item.kind == InputBinding.Kind.VIRTUAL:
+				continue
+			var event := item.to_event()
+			if event == null:
+				continue
+			if to_gameplay:
+				_add_event_if_missing(action, event)
+			# Mouse already clicks Control widgets; putting it on ui_accept would double-fire menus.
+			var mirrored := InputActions.ui_mirror(action)
+			if not to_ui or mirrored.is_empty() or item.kind == InputBinding.Kind.MOUSE_BUTTON:
+				continue
+			_add_event_if_missing(mirrored, event.duplicate(true))
+
+
+func _add_event_if_missing(action: String, event: InputEvent) -> void:
+	if InputMap.action_has_event(action, event):
+		return
+	InputMap.action_add_event(action, event)
 
 
 func _bindings_for(scheme: InputScheme.Id) -> Dictionary:
@@ -149,12 +190,24 @@ func _bindings_for(scheme: InputScheme.Id) -> Dictionary:
 	return _bindings_by_scheme[id]
 
 
+func _normalize_bindings(raw: Variant) -> Array:
+	if raw is Array:
+		var list: Array = []
+		for item in raw:
+			if item is InputBinding:
+				list.append(item)
+		return list
+	if raw is InputBinding:
+		return [raw]
+	return []
+
+
 func _action_for_virtual(virtual_id: String) -> String:
-	var scheme_map: Dictionary = _bindings_for(_scheme)
 	for action in InputActions.ALL:
-		var binding := scheme_map.get(action) as InputBinding
-		if binding != null and binding.kind == InputBinding.Kind.VIRTUAL and binding.virtual_id == virtual_id:
-			return action
+		for binding in get_bindings(action):
+			var item := binding as InputBinding
+			if item != null and item.kind == InputBinding.Kind.VIRTUAL and item.virtual_id == virtual_id:
+				return action
 	return ""
 
 
@@ -199,11 +252,15 @@ func _on_scene_changed(_path: String) -> void:
 func _load_from_disk() -> void:
 	var saved: Variant = SaveLoad.get_value(SAVE_KEY, {})
 	if saved is not Dictionary:
-		_scheme = InputScheme.Id.KEYBOARD
+		_scheme = InputFactory.default_scheme()
 		_port = InputFactory.make(_scheme)
 		return
 	var data := saved as Dictionary
-	_scheme = InputFactory.from_id(str(data.get("scheme", "keyboard")))
+	var saved_scheme := str(data.get("scheme", ""))
+	if saved_scheme.is_empty():
+		_scheme = InputFactory.default_scheme()
+	else:
+		_scheme = InputFactory.from_id(saved_scheme)
 	_port = InputFactory.make(_scheme)
 	var stored: Variant = data.get("bindings", {})
 	if stored is Dictionary:
@@ -230,9 +287,16 @@ func _serialize_all() -> Dictionary:
 		var packed := {}
 		var scheme_map: Dictionary = _bindings_by_scheme[scheme_id]
 		for action in scheme_map.keys():
-			var binding := scheme_map[action] as InputBinding
-			if binding != null:
-				packed[action] = binding.to_dictionary()
+			var list := _normalize_bindings(scheme_map[action])
+			if list.is_empty():
+				continue
+			if list.size() == 1:
+				packed[action] = (list[0] as InputBinding).to_dictionary()
+			else:
+				var entries: Array = []
+				for binding in list:
+					entries.append((binding as InputBinding).to_dictionary())
+				packed[action] = entries
 		output[scheme_id] = packed
 	return output
 
@@ -247,8 +311,14 @@ func _deserialize_all(stored: Dictionary) -> Dictionary:
 		var defaults: Dictionary = InputFactory.make(InputFactory.from_id(str(scheme_id))).get_default_bindings()
 		for action in InputActions.ALL:
 			var raw: Variant = packed.get(action, null)
-			if raw is Dictionary:
-				scheme_map[action] = InputBinding.from_dictionary(raw)
+			if raw is Array:
+				var list: Array = []
+				for entry in raw:
+					if entry is Dictionary:
+						list.append(InputBinding.from_dictionary(entry))
+				scheme_map[action] = list if not list.is_empty() else defaults.get(action)
+			elif raw is Dictionary:
+				scheme_map[action] = [InputBinding.from_dictionary(raw)]
 			else:
 				scheme_map[action] = defaults.get(action)
 		output[str(scheme_id)] = scheme_map

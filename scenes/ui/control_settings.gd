@@ -27,6 +27,10 @@ func _ready() -> void:
 	btn_scheme_next.pressed.connect(func() -> void: _cycle_scheme(1))
 	btn_reset.pressed.connect(_on_reset)
 	btn_back.pressed.connect(_on_back)
+	btn_scheme_prev.focus_neighbor_left = btn_scheme_prev.get_path()
+	btn_scheme_prev.focus_neighbor_right = btn_scheme_next.get_path()
+	btn_scheme_next.focus_neighbor_left = btn_scheme_prev.get_path()
+	btn_scheme_next.focus_neighbor_right = btn_scheme_next.get_path()
 	if not InputManager.bindings_changed.is_connected(_refresh_labels):
 		InputManager.bindings_changed.connect(_refresh_labels)
 	if not InputManager.scheme_changed.is_connected(_on_scheme_changed):
@@ -48,7 +52,11 @@ func _input(event: InputEvent) -> void:
 	if _listening_action.is_empty():
 		if event.is_echo():
 			return
-		if event.is_action_pressed(InputActions.BTN_B) or event.is_action_pressed(InputActions.BTN_START):
+		if event.is_action_pressed(InputActions.LEFT):
+			_press_scheme_button(btn_scheme_prev)
+		elif event.is_action_pressed(InputActions.RIGHT):
+			_press_scheme_button(btn_scheme_next)
+		elif event.is_action_pressed(InputActions.BTN_B) or event.is_action_pressed(InputActions.BTN_START):
 			_on_back()
 			get_viewport().set_input_as_handled()
 		return
@@ -65,6 +73,12 @@ func _input(event: InputEvent) -> void:
 		return
 	InputManager.set_binding(_listening_action, binding)
 	_stop_listen()
+	get_viewport().set_input_as_handled()
+
+
+func _press_scheme_button(button: Button) -> void:
+	button.grab_focus()
+	button.pressed.emit()
 	get_viewport().set_input_as_handled()
 
 
@@ -148,7 +162,7 @@ func _update_hint() -> void:
 		else:
 			hint_label.text = "PRESS A CONTROL FOR THIS ACTION"
 		return
-	hint_label.text = "ONLY THE SELECTED INPUT TYPE IS ACTIVE"
+	hint_label.text = "LEFT RIGHT CHANGE TYPE   B BACK"
 
 
 func _build_action_rows() -> void:

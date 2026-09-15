@@ -4,3 +4,5 @@
 
 # Cursor local agent folder (rules/settings stay on machine)
 .cursor/
+.vscode/
+.docs/

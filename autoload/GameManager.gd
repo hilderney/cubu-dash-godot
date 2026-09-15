@@ -49,10 +49,12 @@ func go_level_select() -> void:
 
 func start_run() -> void:
 	is_running = true
+	InputManager.sync_input_map()
 
 
 func end_run() -> void:
 	is_running = false
+	InputManager.sync_input_map()
 
 
 func add_coins(amount: int) -> void:

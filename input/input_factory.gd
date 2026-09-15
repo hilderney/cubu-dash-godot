@@ -57,3 +57,13 @@ static func from_id(id: String) -> InputScheme.Id:
 static func cycle(scheme: InputScheme.Id, direction: int) -> InputScheme.Id:
 	var next := wrapi(int(scheme) + direction, 0, 4)
 	return next as InputScheme.Id
+
+
+static func is_mobile_platform() -> bool:
+	return OS.has_feature("android") or OS.has_feature("ios") or OS.has_feature("mobile")
+
+
+static func default_scheme() -> InputScheme.Id:
+	if is_mobile_platform():
+		return InputScheme.Id.TOUCH
+	return InputScheme.Id.KEYBOARD

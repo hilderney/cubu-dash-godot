@@ -12,11 +12,23 @@ func accepts_event(event: InputEvent) -> bool:
 
 func get_default_bindings() -> Dictionary:
 	return {
-		InputActions.LEFT: InputBinding.from_key(KEY_LEFT),
-		InputActions.RIGHT: InputBinding.from_key(KEY_RIGHT),
-		InputActions.UP: InputBinding.from_key(KEY_UP),
-		InputActions.DOWN: InputBinding.from_key(KEY_DOWN),
-		InputActions.BTN_A: InputBinding.from_key(KEY_SPACE),
-		InputActions.BTN_B: InputBinding.from_key(KEY_SHIFT),
+		InputActions.LEFT: [
+			InputBinding.from_key(KEY_A),
+			InputBinding.from_key(KEY_LEFT),
+		],
+		InputActions.RIGHT: [
+			InputBinding.from_key(KEY_D),
+			InputBinding.from_key(KEY_RIGHT),
+		],
+		InputActions.UP: [
+			InputBinding.from_key(KEY_W),
+			InputBinding.from_key(KEY_UP),
+		],
+		InputActions.DOWN: [
+			InputBinding.from_key(KEY_S),
+			InputBinding.from_key(KEY_DOWN),
+		],
+		InputActions.BTN_A: InputBinding.from_key(KEY_J),
+		InputActions.BTN_B: InputBinding.from_key(KEY_K),
 		InputActions.BTN_START: InputBinding.from_key(KEY_ESCAPE),
 	}

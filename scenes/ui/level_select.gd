@@ -7,7 +7,7 @@
 ##   look_ahead ramps 1 -> 2 -> 3 over time (0 / 0.8s / 1.8s).
 ##   Whatever crosses north becomes selected; the target advances with it.
 ##   At max look-ahead, speed stays constant.
-## Reverse: short bounce, then one step the other way.
+## Reverse: ease-in the other way.
 
 
 enum Stage { WORLD, PHASE }
@@ -19,8 +19,8 @@ const ITEM_SCENE := preload("res://scenes/ui/CarouselItem.tscn")
 const MAX_LOOK: int = 3
 const HOLD_LOOK_2: float = 0.80
 const HOLD_LOOK_3: float = 1.80
-const HOLD_MODE_AFTER: float = 0.16 ## after this, tap upgrades to continuous hold
-const TRANSITION_MS: float = 0.80
+const HOLD_MODE_AFTER: float = 0.22 ## held down this long, tap upgrades to continuous hold
+const TRANSITION_MS: float = 0.35
 
 const WORLD_COLORS: Array[Color] = [
 	Color("FF6B35"), Color("FFE66D"), Color("4ECDC4"), Color("FF8C42"),
@@ -34,13 +34,11 @@ const WORLD_COLORS: Array[Color] = [
 @export var speed_look_2: float = 4.4
 @export var speed_look_3: float = 5.8
 @export var angular_accel: float = 22.0
-@export var settle_bounce: float = 0.22
-@export var settle_duration: float = 0.28
-@export var reverse_bounce: float = 0.10
-@export var reverse_duration: float = 0.12
-@export var tap_window: float = 0.45
-## After releasing, keep continuous chase briefly so rapid taps feel like holding.
-@export var release_coast_grace: float = 0.20
+@export var settle_bounce: float = 0.11
+@export var settle_duration: float = 0.07
+@export var reverse_bounce: float = 0.05
+@export var reverse_duration: float = 0.04
+@export var tap_window: float = 0.015
 @export var transition_duration: float = TRANSITION_MS
 ## Dive into the north item.
 @export var dive_zoom: float = 9.0
@@ -55,7 +53,7 @@ const WORLD_COLORS: Array[Color] = [
 ## Pixel nudge toward the dock target during bounce.
 @export var transition_bounce_pixels: float = 22.0
 ## Duration of the dock bounce only.
-@export var transition_bounce_duration: float = 0.18
+@export var transition_bounce_duration: float = 0.03
 
 @onready var camera: Camera2D = %Camera2D
 @onready var pivot: Node2D = %Pivot
@@ -92,7 +90,6 @@ var _holding: bool = false
 var _hold_dir: int = 0
 var _hold_time: float = 0.0
 var _tap_window_left: float = 0.0
-var _release_grace_left: float = 0.0
 var _reverse_pending_dir: int = 0
 
 var _tween: Tween
@@ -149,23 +146,10 @@ func _process(delta: float) -> void:
 	if _tap_window_left > 0.0:
 		_tap_window_left = maxf(0.0, _tap_window_left - delta)
 
-	# Rapid taps: keep HOLD alive briefly after each release
-	if not _holding and _mode == SpinMode.HOLD and _release_grace_left > 0.0:
-		_release_grace_left = maxf(0.0, _release_grace_left - delta)
-		_hold_time += delta
-		_update_look_ahead_from_hold()
-		_integrate_hold(delta)
-		if _release_grace_left <= 0.0:
-			_settle_to_nearest()
-		_update_item_billboards()
-		_update_camera()
-		hub.rotation += delta * 0.35
-		return
-
 	if _holding and _mode in [SpinMode.TAP, SpinMode.HOLD]:
 		_hold_time += delta
 		if _mode == SpinMode.TAP and _hold_time >= HOLD_MODE_AFTER:
-			_mode = SpinMode.HOLD
+			_enter_hold_chase(_dir)
 		if _mode == SpinMode.HOLD:
 			_update_look_ahead_from_hold()
 
@@ -185,35 +169,24 @@ func _process(delta: float) -> void:
 # ---------------------------------------------------------------------------
 
 func _press_dir(dir: int) -> void:
-	# Ignore spam while reverse bounce plays (remember latest side)
-	if _mode == SpinMode.REVERSE_BOUNCE:
-		_holding = true
-		_hold_dir = dir
-		_reverse_pending_dir = dir
-		_release_grace_left = 0.0
-		return
-
 	if _mode == SpinMode.SETTLE:
 		_kill_tween()
 		_snap_visual_to_selected()
 		_mode = SpinMode.IDLE
 
-	# Opposite direction while moving -> short reverse, then continuous chase
+	# Opposite direction while moving -> ease-in the other way
 	if _mode in [SpinMode.HOLD, SpinMode.TAP] and _dir != 0 and dir != _dir:
 		_start_reverse(dir)
 		return
 
 	_holding = true
 	_hold_dir = dir
-	_release_grace_left = 0.0
 
-	# Same side while already chasing: behave like holding (do not reset hold_time)
+	# Already chasing this way: keep the hold ramp (do not treat extra taps as mash)
 	if _mode == SpinMode.HOLD and dir == _dir:
-		_boost_look_ahead_from_tap()
-		_tap_window_left = tap_window
 		return
 
-	# Rapid same-side taps while in TAP or shortly after: upgrade to HOLD chase
+	# Same-side taps stay TAP (1 / 2 / 3 slots). Hold only comes from keeping the key down.
 	var window_open := _tap_window_left > 0.0
 	var continue_same := (
 		(_mode == SpinMode.TAP and dir == _dir)
@@ -223,7 +196,8 @@ func _press_dir(dir: int) -> void:
 
 	if continue_same:
 		_boost_look_ahead_from_tap()
-		_enter_hold_chase(dir)
+		_retarget_tap()
+		_play_tap_spin()
 		return
 
 	# Fresh single tap: one committed step (hold upgrades to continuous chase)
@@ -234,17 +208,15 @@ func _press_dir(dir: int) -> void:
 	_tap_origin_index = selected_index
 	_tap_origin_rotation = carousel.rotation + _angled(carousel.rotation, _slot_rotation(_tap_origin_index))
 	_retarget_tap()
-	_angular_vel = -float(dir) * speed_look_1
-	_mode = SpinMode.TAP
 	_set_selected(posmod(_tap_origin_index + _dir, _item_count))
+	_play_tap_spin()
 
 
 func _release_dir() -> void:
 	_holding = false
 	_hold_dir = 0
-	# HOLD: grace so rapid re-press keeps continuous chase (same as holding)
 	if _mode == SpinMode.HOLD:
-		_release_grace_left = release_coast_grace
+		_settle_to_nearest()
 		return
 	# TAP: keep going to the committed destination
 
@@ -252,17 +224,12 @@ func _release_dir() -> void:
 func _boost_look_ahead_from_tap() -> void:
 	_tap_count = mini(_tap_count + 1, MAX_LOOK)
 	_look_ahead = clampi(maxi(_look_ahead, _tap_count), 1, MAX_LOOK)
-	# Match hold ramp so spam feels like keeping the key down
-	if _tap_count >= 3:
-		_hold_time = maxf(_hold_time, HOLD_LOOK_3)
-	elif _tap_count >= 2:
-		_hold_time = maxf(_hold_time, HOLD_LOOK_2)
 
 
 func _enter_hold_chase(dir: int) -> void:
+	_kill_tween()
 	_dir = dir
 	_mode = SpinMode.HOLD
-	_release_grace_left = 0.0
 	if is_zero_approx(_angular_vel):
 		_angular_vel = -float(dir) * _speed_for_look(_look_ahead)
 	_update_look_ahead_from_hold()
@@ -295,25 +262,33 @@ func _speed_for_look(look: int) -> float:
 # TAP movement (fixed destination)
 # ---------------------------------------------------------------------------
 
-func _integrate_tap(delta: float) -> void:
-	# If this frame switched to hold, next iteration handles it
+func _integrate_tap(_delta: float) -> void:
 	if _mode != SpinMode.TAP:
 		return
-
-	_move_toward_angle(_tap_target_rotation, _speed_for_look(_look_ahead), delta)
 	_preview_selection_along_path()
 
-	if absf(_tap_target_rotation - carousel.rotation) <= 0.002:
-		carousel.rotation = _tap_target_rotation
-		if _holding:
-			_angular_vel = 0.0
-			# Still held -> switch to continuous hold from here
-			_mode = SpinMode.HOLD
-			return
-		# Keep travel direction so settle bounce overshoots forward
-		if is_zero_approx(_angular_vel):
-			_angular_vel = -float(_dir) * speed_look_1
-		_settle_to_index(posmod(_tap_origin_index + _dir * _look_ahead, _item_count))
+
+func _play_tap_spin() -> void:
+	_kill_tween()
+	_mode = SpinMode.TAP
+	var remaining := absf(_tap_target_rotation - carousel.rotation)
+	var duration := remaining / maxf(_speed_for_look(_look_ahead), 0.01)
+	duration = maxf(duration, 0.03)
+	_angular_vel = -float(_dir) * _speed_for_look(_look_ahead)
+	_tween = create_tween()
+	_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	_tween.tween_property(carousel, "rotation", _tap_target_rotation, duration)
+	_tween.tween_callback(_on_tap_arrived)
+
+
+func _on_tap_arrived() -> void:
+	if _mode != SpinMode.TAP:
+		return
+	carousel.rotation = _tap_target_rotation
+	if _holding:
+		_enter_hold_chase(_dir)
+		return
+	_park_on_slot(posmod(_tap_origin_index + _dir * _look_ahead, _item_count))
 
 
 # ---------------------------------------------------------------------------
@@ -369,8 +344,7 @@ func _settle_to_nearest() -> void:
 
 
 func _settle_to_index(final_index: int) -> void:
-	_set_selected(final_index)
-	_play_settle_bounce(final_index)
+	_park_on_slot(final_index)
 
 
 func _start_reverse(new_dir: int) -> void:
@@ -378,82 +352,40 @@ func _start_reverse(new_dir: int) -> void:
 	_holding = true
 	_hold_dir = new_dir
 	_hold_time = 0.0
-	_release_grace_left = 0.0
-	_reverse_pending_dir = new_dir
-	_mode = SpinMode.REVERSE_BOUNCE
+	_reverse_pending_dir = 0
 
 	var nearest := _index_from_angle(carousel.rotation)
 	var base := carousel.rotation + _angled(carousel.rotation, _slot_rotation(nearest))
-	var kick := base + float(_dir) * _angle_step * reverse_bounce
-
-	_tween = create_tween()
-	_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(carousel, "rotation", kick, reverse_duration * 0.45)
-	_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	_tween.tween_property(carousel, "rotation", base, reverse_duration * 0.55)
-	_tween.tween_callback(func() -> void:
-		var final_dir := _reverse_pending_dir if _reverse_pending_dir != 0 else new_dir
-		_reverse_pending_dir = 0
-		_set_selected(nearest)
-		_dir = final_dir
-		_tap_count = 1
-		_look_ahead = 1
-		_hold_time = 0.0
-		_tap_origin_index = nearest
-		_tap_origin_rotation = base
-		_retarget_tap()
-		_angular_vel = -float(final_dir) * speed_look_1
-		_tap_window_left = tap_window
-		# Still pressing (or rapid spam) -> continuous chase like holding
-		if _holding or Input.is_action_pressed(InputActions.LEFT) or Input.is_action_pressed(InputActions.RIGHT):
-			_hold_dir = final_dir
-			_enter_hold_chase(final_dir)
-		else:
-			_mode = SpinMode.TAP
-	)
+	carousel.rotation = base
+	_set_selected(nearest)
+	_dir = new_dir
+	_tap_count = 1
+	_look_ahead = 1
+	_tap_origin_index = nearest
+	_tap_origin_rotation = base
+	_retarget_tap()
+	_tap_window_left = tap_window
+	if Input.is_action_pressed(InputActions.LEFT) or Input.is_action_pressed(InputActions.RIGHT):
+		_enter_hold_chase(new_dir)
+	else:
+		_play_tap_spin()
 
 
-func _play_settle_bounce(final_index: int) -> void:
-	## Park on the slot with a short overshoot, then snap back.
-	if _mode == SpinMode.SETTLE:
-		return
-
-	# Capture travel direction before killing velocity
-	var travel_sign := signf(_angular_vel)
-	if is_zero_approx(travel_sign):
-		# dir +1 rotates the ring clockwise on screen => rotation decreases
-		travel_sign = -float(_dir) if _dir != 0 else -1.0
-
-	_mode = SpinMode.SETTLE
+func _park_on_slot(final_index: int) -> void:
+	_kill_tween()
+	_set_selected(final_index)
+	var final_angle := carousel.rotation + _angled(carousel.rotation, _slot_rotation(final_index))
+	carousel.rotation = final_angle
+	_angular_vel = 0.0
 	_holding = false
 	_hold_dir = 0
-	_release_grace_left = 0.0
-	_angular_vel = 0.0
-
-	var final_angle := carousel.rotation + _angled(carousel.rotation, _slot_rotation(final_index))
-	# If already dead-on the slot, still force a visible nudge past it
-	var overshoot := final_angle + travel_sign * _angle_step * settle_bounce
-
-	_kill_tween()
-	_tween = create_tween()
-	# Advance a bit past the park point
-	_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(carousel, "rotation", overshoot, settle_duration * 0.32)
-	# Return quickly to the resting slot
-	_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(carousel, "rotation", final_angle, settle_duration * 0.68)
-	_tween.tween_callback(func() -> void:
-		# Keep unwrapped angle to avoid a TAU wrap snap after the bounce
-		carousel.rotation = final_angle
-		_angular_vel = 0.0
-		_mode = SpinMode.IDLE
-		_look_ahead = 1
-		if _tap_window_left <= 0.0:
-			_dir = 0
-			_tap_count = 0
-		_apply_selection_visuals()
-		_refresh_selection_label()
-	)
+	_mode = SpinMode.IDLE
+	_look_ahead = 1
+	if _tap_window_left <= 0.0:
+		_dir = 0
+		_tap_count = 0
+	_apply_selection_visuals()
+	_refresh_selection_label()
 
 
 func _set_selected(index: int) -> void:
@@ -570,7 +502,6 @@ func _reset_spin() -> void:
 	_hold_dir = 0
 	_hold_time = 0.0
 	_tap_window_left = 0.0
-	_release_grace_left = 0.0
 	_reverse_pending_dir = 0
 
 
@@ -626,7 +557,7 @@ func _on_back() -> void:
 
 
 # ---------------------------------------------------------------------------
-# Circle transitions (800ms, ease-in)
+# Circle transitions (400ms, ease-in)
 # zoom_in  = arrive from far into selection framing
 # zoom_out = leave the current circle
 # dive_in  = plunge into the north item
