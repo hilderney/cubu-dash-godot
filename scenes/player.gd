@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
-## Personagem fixo no eixo X: a tela/mundo vem até ele.
-## Controles: pulo (ui_accept / espaço) e dash (Shift).
+## Player stays fixed on X; the world/screen scrolls toward them.
+## Controls: jump (btn_a) and dash (btn_b).
 
 @export var jump_force: float = -600.0
 @export var gravity: float = 1200.0
@@ -22,13 +22,13 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += gravity * delta
 
-	if Input.is_action_just_pressed("ui_accept") and jump_count < max_jumps:
+	if Input.is_action_just_pressed(InputActions.BTN_A) and jump_count < max_jumps:
 		velocity.y = jump_force
 		jump_count += 1
 		current_state = State.JUMPING
 		animate_jump()
 
-	if Input.is_action_just_pressed("dash") and not is_dashing:
+	if Input.is_action_just_pressed(InputActions.BTN_B) and not is_dashing:
 		start_dash()
 
 	if is_dashing:
@@ -37,7 +37,7 @@ func _physics_process(delta: float) -> void:
 			is_dashing = false
 			current_state = State.RUNNING
 
-	# Sem movimento horizontal — o World em Game.gd faz o scroll
+	# No horizontal movement — Game.gd scrolls the World
 	velocity.x = 0.0
 	move_and_slide()
 
@@ -52,7 +52,7 @@ func start_dash() -> void:
 	is_dashing = true
 	dash_timer = dash_duration
 	current_state = State.DASHING
-	# Acelera o scroll do mundo (efeito de dash "para frente")
+	# Speeds up world scroll (forward dash feel)
 	EventBus.player_dashed.emit()
 
 

@@ -22,6 +22,7 @@ AudioManager="*uid://bixr5anb4qoxe"
 GameManager="*uid://ccei6wn8ne0x8"
 PlayerStats="*uid://bjelsamvy626v"
 SaveLoad="*uid://dd5q5rqrtwjdm"
+InputManager="*res://autoload/InputManager.gd"
 
 [display]
 
@@ -31,16 +32,33 @@ window/stretch/mode="canvas_items"
 
 [input]
 
-ui_accept={
+left={
 "deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":true,"keycode":0,"physical_keycode":32,"key_label":0,"unicode":32,"location":0,"echo":false,"script":null)
-, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":true,"keycode":0,"physical_keycode":87,"key_label":0,"unicode":119,"location":0,"echo":false,"script":null)
-]
+"events": []
 }
-dash={
+right={
 "deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":true,"keycode":0,"physical_keycode":4194325,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
-]
+"events": []
+}
+up={
+"deadzone": 0.5,
+"events": []
+}
+down={
+"deadzone": 0.5,
+"events": []
+}
+btn_a={
+"deadzone": 0.5,
+"events": []
+}
+btn_b={
+"deadzone": 0.5,
+"events": []
+}
+btn_start={
+"deadzone": 0.5,
+"events": []
 }
 
 [physics]

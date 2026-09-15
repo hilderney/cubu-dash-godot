@@ -1,11 +1,20 @@
 extends Node
 
+## Save facade. Game code talks to this autoload; the adapter does I/O.
 
-# Called when the node enters the scene tree for the first time.
+var _port: SavePort
+var _data: Dictionary = {}
+
+
 func _ready() -> void:
-	pass # Replace with function body.
+	_port = SaveFactory.make_default()
+	_data = _port.load_data()
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func get_value(key: String, default_value: Variant = null) -> Variant:
+	return _data.get(key, default_value)
+
+
+func set_value(key: String, value: Variant) -> void:
+	_data[key] = value
+	_port.save_data(_data)

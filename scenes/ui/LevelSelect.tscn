@@ -1,7 +1,7 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://cyyh2ic8t5w4a"]
 
-[ext_resource type="Script" path="res://scenes/ui/level_select.gd" id="1_script"]
-[ext_resource type="FontFile" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
+[ext_resource type="Script" uid="uid://d1erpokskr0cu" path="res://scenes/ui/level_select.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://bftlihwdfu6iy" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_stage"]
 font = ExtResource("2_font")
@@ -26,13 +26,13 @@ font = ExtResource("2_font")
 font_size = 9
 font_color = Color(1, 0.901961, 0.427451, 0.75)
 
-[node name="LevelSelect" type="Node2D"]
+[node name="LevelSelect" type="Node2D" unique_id=118014556]
 script = ExtResource("1_script")
 
-[node name="BGLayer" type="CanvasLayer" parent="."]
+[node name="BGLayer" type="CanvasLayer" parent="." unique_id=1236005664]
 layer = -1
 
-[node name="Background" type="ColorRect" parent="BGLayer"]
+[node name="Background" type="ColorRect" parent="BGLayer" unique_id=1599372715]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -41,38 +41,38 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.0313726, 0.0784314, 0.14902, 1)
 
-[node name="Stripe" type="ColorRect" parent="BGLayer"]
-offset_left = -200.0
-offset_top = 80.0
-offset_right = 1500.0
-offset_bottom = 200.0
+[node name="Stripe" type="ColorRect" parent="BGLayer" unique_id=655792055]
+offset_left = -243.00002
+offset_top = 121.0
+offset_right = 1457.0
+offset_bottom = 333.6692
 rotation = -0.2
 mouse_filter = 2
 color = Color(1, 0.419608, 0.207843, 0.14)
 
-[node name="Stripe2" type="ColorRect" parent="BGLayer"]
-offset_left = -160.0
-offset_top = 520.0
-offset_right = 1560.0
-offset_bottom = 620.0
+[node name="Stripe2" type="ColorRect" parent="BGLayer" unique_id=414703166]
+offset_left = -223.0
+offset_top = 533.0
+offset_right = 1497.0
+offset_bottom = 633.0
 rotation = 0.12
 mouse_filter = 2
 color = Color(0.305882, 0.803922, 0.768627, 0.1)
 
-[node name="Pivot" type="Node2D" parent="."]
+[node name="Pivot" type="Node2D" parent="." unique_id=1732511778]
 unique_name_in_owner = true
 position = Vector2(640, 780)
 
-[node name="RingGuide" type="Node2D" parent="Pivot"]
+[node name="RingGuide" type="Node2D" parent="Pivot" unique_id=641887361]
 unique_name_in_owner = true
 
-[node name="Carousel" type="Node2D" parent="Pivot"]
+[node name="Carousel" type="Node2D" parent="Pivot" unique_id=89896967]
 unique_name_in_owner = true
 
-[node name="Hub" type="Node2D" parent="Pivot"]
+[node name="Hub" type="Node2D" parent="Pivot" unique_id=1196500476]
 unique_name_in_owner = true
 
-[node name="HubCore" type="ColorRect" parent="Pivot/Hub"]
+[node name="HubCore" type="ColorRect" parent="Pivot/Hub" unique_id=1933785372]
 offset_left = -28.0
 offset_top = -28.0
 offset_right = 28.0
@@ -81,7 +81,7 @@ pivot_offset = Vector2(28, 28)
 mouse_filter = 2
 color = Color(1, 0.419608, 0.207843, 1)
 
-[node name="HubInner" type="ColorRect" parent="Pivot/Hub"]
+[node name="HubInner" type="ColorRect" parent="Pivot/Hub" unique_id=1480461099]
 offset_left = -16.0
 offset_top = -16.0
 offset_right = 16.0
@@ -90,14 +90,13 @@ pivot_offset = Vector2(16, 16)
 mouse_filter = 2
 color = Color(1, 0.901961, 0.427451, 1)
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=721584386]
 unique_name_in_owner = true
 position = Vector2(640, 360)
-enabled = true
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1324944807]
 
-[node name="StageLabel" type="Label" parent="HUD"]
+[node name="StageLabel" type="Label" parent="HUD" unique_id=583910025]
 unique_name_in_owner = true
 anchors_preset = 5
 anchor_left = 0.5
@@ -111,7 +110,7 @@ text = "SELECT WORLD"
 label_settings = SubResource("LabelSettings_stage")
 horizontal_alignment = 1
 
-[node name="SelectionLabel" type="Label" parent="HUD"]
+[node name="SelectionLabel" type="Label" parent="HUD" unique_id=1868615734]
 unique_name_in_owner = true
 anchors_preset = 5
 anchor_left = 0.5
@@ -125,7 +124,7 @@ text = "1 / 12"
 label_settings = SubResource("LabelSettings_selection")
 horizontal_alignment = 1
 
-[node name="HintLabel" type="Label" parent="HUD"]
+[node name="HintLabel" type="Label" parent="HUD" unique_id=1113345527]
 unique_name_in_owner = true
 anchors_preset = 7
 anchor_left = 0.5
@@ -138,6 +137,6 @@ offset_right = 420.0
 offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 0
-text = "← → GIRAR   ENTER CONFIRMAR   ESC VOLTAR"
+text = "← → SPIN   ENTER CONFIRM   ESC BACK"
 label_settings = SubResource("LabelSettings_hint")
 horizontal_alignment = 1

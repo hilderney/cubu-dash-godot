@@ -1,7 +1,7 @@
 extends Node2D
 
-## Mundo rola em direção ao player (Geometry Dash / Robot Unicorn Attack).
-## O personagem fica fixo no X; só controla pulo e dash.
+## World scrolls toward the player (Geometry Dash / Robot Unicorn Attack style).
+## Player stays fixed on X; only jump and dash are controlled.
 
 @export var base_scroll_speed: float = 350.0
 @export var dash_scroll_multiplier: float = 2.2
@@ -16,6 +16,7 @@ var _spawn_x: float = 0.0
 
 
 func _ready() -> void:
+	GameManager.start_run()
 	_scroll_speed = base_scroll_speed
 	_spawn_x = player.global_position.x
 	_lock_player_x()

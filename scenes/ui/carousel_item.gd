@@ -1,6 +1,6 @@
 extends Node2D
 
-## Um slot do carrossel (mundo ou fase).
+## One carousel slot (world or phase).
 
 @onready var visual: ColorRect = $Visual
 @onready var border: ColorRect = $Border

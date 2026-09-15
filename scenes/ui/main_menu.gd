@@ -1,6 +1,6 @@
 extends Control
 
-## Tela de início — Cubu Dash (estilo retro arcade).
+## Title screen — Cubu Dash (retro arcade style).
 
 @onready var title_label: Label = %TitleLabel
 @onready var subtitle_label: Label = %SubtitleLabel
@@ -35,9 +35,9 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_pulse_t += delta
-	# Faixa diagonal “andando” no fundo
+	# Diagonal stripe drifting in the background
 	stripe_band.position.x = -120.0 + fmod(_pulse_t * 40.0, 140.0)
-	# Cubos flutuando (presença de marca)
+	# Floating brand cubes
 	cube_a.rotation_degrees = sin(_pulse_t * 1.4) * 8.0
 	cube_b.rotation_degrees = cos(_pulse_t * 1.1) * 10.0
 	cube_c.rotation_degrees = sin(_pulse_t * 1.7 + 1.0) * 6.0
@@ -82,7 +82,7 @@ func _on_graphic() -> void:
 
 
 func _on_controls() -> void:
-	GameManager.open_under_construction("Control Settings")
+	GameManager.go_control_settings()
 
 
 func _on_debugger() -> void:
