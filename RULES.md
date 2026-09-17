@@ -31,6 +31,39 @@ InputMap.add_event(...) inside the player
 
 New backend = new adapter + factory choice. Business rules stay outside adapters.
 
+## IDTCS (every interaction)
+
+Before implementing a gameplay or UI interaction, specify:
+
+1. **INPUT** — what triggers it
+2. **DETECTION** — world/query checks (or N/A)
+3. **TRANSFORM** — what changes (motion, anim, data)
+4. **COMMUNICATION** — who is notified / called (or N/A)
+5. **STATE AND LOGIC** — states and rules that apply
+
+If any axis is unclear, **ask** — do not guess. Full template and examples: `.docs/idtcs-pattern.md`.
+
+## Reactive sounds (mandatory)
+
+Every meaningful action or state change must fire a **reactive sound** — short audio feedback that answers what just happened. Silence after a player/UI/world event is a bug unless the human explicitly marks audio as N/A.
+
+Until Sound settings and `AudioManager` / AudioPort are real:
+
+- At every interaction peak, insert an English marker comment exactly like:
+  `# TODO: AUDIO — <what just happened>`
+- Example: `# TODO: AUDIO — player jumped` / `# TODO: AUDIO — locked slot denied`
+- Do **not** invent final `AudioStream` assets or fake play calls that imply a finished system.
+- Search the repo for `TODO: AUDIO` when wiring real SFX later; replace each marker with `AudioManager` / EventBus → audio COMMUNICATION.
+
+When audio exists:
+
+- Wire SFX through **COMMUNICATION** (prefer `EventBus` → `AudioManager` / AudioPort), not one-off players scattered around.
+- One clear cue per interaction peak. Do not spam the same one-shot every physics frame.
+- If the sound identity (timbre, pitch, length) is unknown: **ask** before inventing a final style.
+- Music (BGM) is separate from reactive SFX; reactive SFX stay readable over music.
+
+Details: `.docs/reactive-sounds.md`.
+
 ## Input
 
 - Use `InputActions` names (`left`, `btn_a`, …), not raw keys.
