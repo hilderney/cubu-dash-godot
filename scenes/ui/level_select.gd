@@ -403,18 +403,20 @@ func _build_world_data() -> void:
 	worlds.clear()
 	var world_names := [
 		"NEON CUBES", "PIXEL PEAKS", "VOLT VALLEY", "CANDY CORE",
-		"ASTRO ALLEY", "EMBER EDGE", "GLITCH GULF", "FROST FORGE",
-		"SUNKEN SYNC", "HYPER HIVE", "VOID VISTA", "CHRONO CIRCUIT",
 	]
 	for i in world_names.size():
-		var phase_count := 8 + (i % 5)
 		var phases: Array[Dictionary] = []
-		for p in phase_count:
-			phases.append({"name": "PHASE %d-%d" % [i + 1, p + 1], "id": p})
+		for p in 4:
+			phases.append({
+				"name": "PHASE %d-%d" % [i + 1, p + 1],
+				"id": p,
+				"locked": p > 0,
+			})
 		worlds.append({
 			"name": world_names[i],
 			"id": i,
 			"color": WORLD_COLORS[i % WORLD_COLORS.size()],
+			"locked": i > 0,
 			"phases": phases,
 		})
 
@@ -464,14 +466,24 @@ func _play_enter_anim(enter_anim: EnterAnim) -> void:
 func _world_entries() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for w in worlds:
-		out.append({"id": w.id, "name": w.name, "color": w.color})
+		out.append({
+			"id": w.id,
+			"name": w.name,
+			"color": w.color,
+			"locked": bool(w.get("locked", false)),
+		})
 	return out
 
 
 func _phase_entries(world: Dictionary) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for p in world.phases:
-		out.append({"id": p.id, "name": p.name, "color": world.color})
+		out.append({
+			"id": p.id,
+			"name": p.name,
+			"color": world.color,
+			"locked": bool(p.get("locked", false)),
+		})
 	return out
 
 
@@ -485,7 +497,7 @@ func _rebuild_carousel(entries: Array[Dictionary]) -> void:
 		var entry: Dictionary = entries[i]
 		var item: Node2D = ITEM_SCENE.instantiate()
 		carousel.add_child(item)
-		item.setup(entry.id, entry.name, entry.color)
+		item.setup(entry.id, entry.name, entry.color, bool(entry.get("locked", false)))
 		var angle := -PI / 2.0 + float(i) * _angle_step
 		item.position = Vector2(cos(angle), sin(angle)) * ring_radius
 		_items.append(item)
@@ -516,7 +528,11 @@ func _on_confirm() -> void:
 		_settle_to_nearest()
 		return
 
-	# IDLE: confirm north item
+	# IDLE: confirm north item (locked → denied anim, no enter)
+	if _is_selected_locked():
+		_play_denied_on_selected()
+		return
+
 	if stage == Stage.WORLD:
 		selected_world = selected_index
 		# Dive into world, then Select Phase with ZOOM IN
@@ -529,9 +545,23 @@ func _on_confirm() -> void:
 		_play_dive_in(func() -> void:
 			GameManager.current_world = selected_world
 			GameManager.current_phase = selected_phase
-			GameManager.start_run()
 			GameManager.change_scene(GameManager.SCENE_GAME)
 		)
+
+
+func _is_selected_locked() -> bool:
+	if selected_index < 0 or selected_index >= _items.size():
+		return true
+	var item := _items[selected_index]
+	return is_instance_valid(item) and bool(item.get("locked"))
+
+
+func _play_denied_on_selected() -> void:
+	if selected_index < 0 or selected_index >= _items.size():
+		return
+	var item := _items[selected_index]
+	if is_instance_valid(item) and item.has_method("play_denied"):
+		item.play_denied()
 
 
 func _on_back() -> void:
@@ -753,13 +783,17 @@ func _update_camera() -> void:
 
 func _refresh_selection_label() -> void:
 	if stage == Stage.WORLD:
-		var w: Dictionary = worlds[selected_world]
-		selection_label.text = "%d / %d\n%s" % [selected_world + 1, worlds.size(), w.name]
+		var w: Dictionary = worlds[selected_index]
+		var lock_tag := "  LOCKED" if bool(w.get("locked", false)) else ""
+		selection_label.text = "%d / %d\n%s%s" % [selected_index + 1, worlds.size(), w.name, lock_tag]
 	else:
 		var w2: Dictionary = worlds[selected_world]
 		var phases: Array = w2.phases
-		var p: Dictionary = phases[selected_phase]
-		selection_label.text = "%s\n%d / %d  %s" % [w2.name, selected_phase + 1, phases.size(), p.name]
+		var p: Dictionary = phases[selected_index]
+		var lock_tag2 := "  LOCKED" if bool(p.get("locked", false)) else ""
+		selection_label.text = "%s\n%d / %d  %s%s" % [
+			w2.name, selected_index + 1, phases.size(), p.name, lock_tag2,
+		]
 
 
 func _kill_tween() -> void:

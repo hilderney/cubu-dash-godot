@@ -14,6 +14,7 @@ var _bindings_by_scheme: Dictionary = {}
 var _touch_controls: CanvasLayer
 var _virtual_remap: Callable
 var _held_virtual: Dictionary = {}
+var _play_exclusive: bool = false
 
 
 func _ready() -> void:
@@ -129,7 +130,8 @@ func is_touch_scheme() -> bool:
 	return _scheme == InputScheme.Id.TOUCH
 
 
-func sync_input_map() -> void:
+func sync_input_map(play_exclusive: bool = false) -> void:
+	_play_exclusive = play_exclusive
 	_apply_to_input_map()
 
 
@@ -150,13 +152,9 @@ func _apply_to_input_map() -> void:
 	# Selected scheme is exclusive for play. Keyboard stays on UI so menus
 	# and Control Settings can always be driven with keys (and mouse clicks).
 	_apply_scheme_bindings(_scheme, true, true)
-	_apply_scheme_bindings(InputScheme.Id.KEYBOARD, not _is_play_exclusive(), true)
-	if not _is_play_exclusive():
+	_apply_scheme_bindings(InputScheme.Id.KEYBOARD, not _play_exclusive, true)
+	if not _play_exclusive:
 		_apply_scheme_bindings(InputScheme.Id.MIX, false, true)
-
-
-func _is_play_exclusive() -> bool:
-	return GameManager.is_running
 
 
 func _apply_scheme_bindings(scheme: InputScheme.Id, to_gameplay: bool, to_ui: bool) -> void:

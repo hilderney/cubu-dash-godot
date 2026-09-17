@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-## In-run pause overlay. Start toggles; A / Resume continues; Main Menu leaves.
+## In-run pause overlay. Start toggles; Resume button continues; Main Menu leaves.
 
 @onready var btn_resume: Button = %BtnResume
 @onready var btn_menu: Button = %BtnMenu

@@ -2,6 +2,7 @@ extends Node2D
 
 ## World scrolls toward the player (Geometry Dash / Robot Unicorn Attack style).
 ## Player stays fixed on X; only jump and dash are controlled.
+## Dash scroll boost follows EventBus.player_dashed / player_dash_ended (Player owns duration).
 
 @export var base_scroll_speed: float = 350.0
 @export var dash_scroll_multiplier: float = 2.2
@@ -24,6 +25,8 @@ func _ready() -> void:
 
 	if not EventBus.player_dashed.is_connected(_on_player_dashed):
 		EventBus.player_dashed.connect(_on_player_dashed)
+	if not EventBus.player_dash_ended.is_connected(_on_player_dash_ended):
+		EventBus.player_dash_ended.connect(_on_player_dash_ended)
 
 
 func _physics_process(delta: float) -> void:
@@ -45,8 +48,7 @@ func _update_camera() -> void:
 
 func _on_player_dashed() -> void:
 	_scroll_speed = base_scroll_speed * dash_scroll_multiplier
-	get_tree().create_timer(player.dash_duration).timeout.connect(_end_dash)
 
 
-func _end_dash() -> void:
+func _on_player_dash_ended() -> void:
 	_scroll_speed = base_scroll_speed

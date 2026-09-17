@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 ## Player stays fixed on X; the world/screen scrolls toward them.
-## Controls: jump (btn_a) and dash (btn_b).
+## Controls: jump (btn_a) and dash (btn_b). IDTCS helpers: _try_jump / start_dash / _end_dash / _on_landed.
 
 @export var jump_force: float = -600.0
 @export var gravity: float = 1200.0
@@ -10,7 +10,7 @@ extends CharacterBody2D
 
 @onready var visual: ColorRect = $ColorRect
 
-enum State { IDLE, RUNNING, JUMPING, DASHING }
+enum State { RUNNING, JUMPING, DASHING }
 var current_state: State = State.RUNNING
 var jump_count: int = 0
 var is_dashing: bool = false
@@ -22,38 +22,61 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += gravity * delta
 
-	if Input.is_action_just_pressed(InputActions.BTN_A) and jump_count < max_jumps:
-		velocity.y = jump_force
-		jump_count += 1
-		current_state = State.JUMPING
-		animate_jump()
+	if Input.is_action_just_pressed(InputActions.BTN_A):
+		_try_jump()
 
-	if Input.is_action_just_pressed(InputActions.BTN_B) and not is_dashing:
+	if Input.is_action_just_pressed(InputActions.BTN_B):
 		start_dash()
 
 	if is_dashing:
 		dash_timer -= delta
 		if dash_timer <= 0.0:
-			is_dashing = false
-			current_state = State.RUNNING
+			_end_dash()
 
 	# No horizontal movement — Game.gd scrolls the World
 	velocity.x = 0.0
 	move_and_slide()
 
-	if is_on_floor():
-		jump_count = 0
-		if not was_on_floor:
-			animate_land()
-	was_on_floor = is_on_floor()
+	var on_floor := is_on_floor()
+	if on_floor and not was_on_floor:
+		_on_landed()
+	was_on_floor = on_floor
+
+
+func _try_jump() -> void:
+	if jump_count >= max_jumps:
+		return
+	velocity.y = jump_force
+	jump_count += 1
+	current_state = State.JUMPING
+	animate_jump()
+	EventBus.player_jumped.emit()
 
 
 func start_dash() -> void:
+	if is_dashing:
+		return
 	is_dashing = true
 	dash_timer = dash_duration
 	current_state = State.DASHING
-	# Speeds up world scroll (forward dash feel)
 	EventBus.player_dashed.emit()
+
+
+func _end_dash() -> void:
+	is_dashing = false
+	dash_timer = 0.0
+	if is_on_floor():
+		current_state = State.RUNNING
+	else:
+		current_state = State.JUMPING
+	EventBus.player_dash_ended.emit()
+
+
+func _on_landed() -> void:
+	jump_count = 0
+	animate_land()
+	if not is_dashing:
+		current_state = State.RUNNING
 
 
 func animate_jump() -> void:

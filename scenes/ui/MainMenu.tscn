@@ -50,7 +50,7 @@ content_margin_bottom = 14
 shadow_offset = Vector2(1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_focus"]
-bg_color = Color(0.0313726, 0.12549, 0.196078, 1)
+draw_center = false
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
