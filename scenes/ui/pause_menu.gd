@@ -27,15 +27,18 @@ func pause_game() -> void:
 	get_tree().paused = true
 	visible = true
 	btn_resume.grab_focus()
+	# TODO: AUDIO — run paused
 
 
 func resume_game() -> void:
 	get_tree().paused = false
 	visible = false
+	# TODO: AUDIO — run resumed
 
 
 func _on_main_menu() -> void:
 	get_tree().paused = false
 	visible = false
+	# TODO: AUDIO — quit run to main menu
 	GameManager.end_run()
 	GameManager.go_main_menu()

@@ -70,20 +70,25 @@ func _start_title_pulse() -> void:
 
 
 func _on_start() -> void:
+	# TODO: AUDIO — UI confirm start game
 	GameManager.go_level_select()
 
 
 func _on_sound() -> void:
+	# TODO: AUDIO — UI open sound settings
 	GameManager.open_under_construction("Sound")
 
 
 func _on_graphic() -> void:
+	# TODO: AUDIO — UI open graphic settings
 	GameManager.open_under_construction("Graphic")
 
 
 func _on_controls() -> void:
+	# TODO: AUDIO — UI open control settings
 	GameManager.go_control_settings()
 
 
 func _on_debugger() -> void:
+	# TODO: AUDIO — UI open debugger
 	GameManager.open_under_construction("Debugger")

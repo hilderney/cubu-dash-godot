@@ -60,3 +60,4 @@ func end_run() -> void:
 func add_coins(amount: int) -> void:
 	coins += amount
 	EventBus.coin_collected.emit(amount)
+	# TODO: AUDIO — coin collected

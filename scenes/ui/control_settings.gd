@@ -72,6 +72,7 @@ func _input(event: InputEvent) -> void:
 	if binding == null:
 		return
 	InputManager.set_binding(_listening_action, binding)
+	# TODO: AUDIO — input binding captured
 	_stop_listen()
 	get_viewport().set_input_as_handled()
 
@@ -84,6 +85,7 @@ func _press_scheme_button(button: Button) -> void:
 
 func _cycle_scheme(direction: int) -> void:
 	_stop_listen()
+	# TODO: AUDIO — input scheme changed
 	InputManager.set_scheme(InputFactory.cycle(InputManager.get_scheme(), direction))
 
 
@@ -94,11 +96,13 @@ func _on_scheme_changed(_scheme: InputScheme.Id) -> void:
 
 func _on_reset() -> void:
 	_stop_listen()
+	# TODO: AUDIO — input bindings reset
 	InputManager.reset_current_scheme()
 
 
 func _on_back() -> void:
 	_stop_listen()
+	# TODO: AUDIO — UI back from control settings
 	GameManager.go_main_menu()
 
 
@@ -129,6 +133,7 @@ func _on_virtual_captured(virtual_id: String) -> void:
 	if _listening_action.is_empty():
 		return
 	InputManager.set_binding(_listening_action, InputBinding.from_virtual(virtual_id))
+	# TODO: AUDIO — input binding captured
 	_stop_listen()
 
 

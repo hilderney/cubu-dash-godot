@@ -51,6 +51,7 @@ func _try_jump() -> void:
 	current_state = State.JUMPING
 	animate_jump()
 	EventBus.player_jumped.emit()
+	# TODO: AUDIO — player jumped
 
 
 func start_dash() -> void:
@@ -60,6 +61,7 @@ func start_dash() -> void:
 	dash_timer = dash_duration
 	current_state = State.DASHING
 	EventBus.player_dashed.emit()
+	# TODO: AUDIO — player dashed
 
 
 func _end_dash() -> void:
@@ -70,11 +72,13 @@ func _end_dash() -> void:
 	else:
 		current_state = State.JUMPING
 	EventBus.player_dash_ended.emit()
+	# TODO: AUDIO — player dash ended
 
 
 func _on_landed() -> void:
 	jump_count = 0
 	animate_land()
+	# TODO: AUDIO — player landed
 	if not is_dashing:
 		current_state = State.RUNNING
 

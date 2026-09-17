@@ -535,12 +535,14 @@ func _on_confirm() -> void:
 
 	if stage == Stage.WORLD:
 		selected_world = selected_index
+		# TODO: AUDIO — confirmed world selection
 		# Dive into world, then Select Phase with ZOOM IN
 		_play_dive_in(func() -> void:
 			_enter_phase_stage(EnterAnim.ZOOM_IN)
 		)
 	else:
 		selected_phase = selected_index
+		# TODO: AUDIO — confirmed phase, start run
 		# Dive into phase, then start the run
 		_play_dive_in(func() -> void:
 			GameManager.current_world = selected_world
@@ -561,6 +563,7 @@ func _play_denied_on_selected() -> void:
 		return
 	var item := _items[selected_index]
 	if is_instance_valid(item) and item.has_method("play_denied"):
+		# TODO: AUDIO — locked slot denied
 		item.play_denied()
 
 
