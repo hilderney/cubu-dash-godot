@@ -83,6 +83,8 @@ World → Phase. North is the selected slot.
 
 Settle **always** parks with a bounce: overshoot past the slot, then snap back. Keep the unwrapped angle (no TAU wrap snap).
 
+Confirm (`btn_a`), Back (`btn_b` / Start), and Left/Right while the ring is still spinning are **queued** until the spin parks (`PendingAction`). Latest pending wins. Same-direction HOLD continues without re-queue. Circle transitions (dive/zoom) still block new actions until IDLE.
+
 ## Circle transitions
 
 Named animations, **800 ms**, cubic **ease-in** for the travel:

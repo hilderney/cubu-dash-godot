@@ -8,10 +8,13 @@
 ##   Whatever crosses north becomes selected; the target advances with it.
 ##   At max look-ahead, speed stays constant.
 ## Reverse: ease-in the other way.
+## Confirm/Back/Direction while spinning: queued until park (PendingAction). Latest pending wins.
 
 
 enum Stage { WORLD, PHASE }
 enum SpinMode { IDLE, TAP, HOLD, REVERSE_BOUNCE, SETTLE, TRANSITION }
+## Queued after spin finishes. Latest pending wins.
+enum PendingAction { NONE, CONFIRM, BACK, SPIN }
 ## How a select circle enters after a transition.
 enum EnterAnim { NONE, ZOOM_IN, DIVE_OUT }
 
@@ -90,7 +93,8 @@ var _holding: bool = false
 var _hold_dir: int = 0
 var _hold_time: float = 0.0
 var _tap_window_left: float = 0.0
-var _reverse_pending_dir: int = 0
+var _pending_action: PendingAction = PendingAction.NONE
+var _pending_dir: int = 0
 
 var _tween: Tween
 var _transition_tween: Tween
@@ -112,20 +116,20 @@ func _input(event: InputEvent) -> void:
 		return
 
 	if event.is_action_pressed(InputActions.BTN_B) or event.is_action_pressed(InputActions.BTN_START):
-		_on_back()
+		_request_back()
 		get_viewport().set_input_as_handled()
 		return
 
 	if event.is_action_pressed(InputActions.BTN_A) and not event.is_echo():
-		_on_confirm()
+		_request_confirm()
 		get_viewport().set_input_as_handled()
 		return
 
 	if event.is_action_pressed(InputActions.RIGHT) and not event.is_echo():
-		_press_dir(1)
+		_request_dir(1)
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(InputActions.LEFT) and not event.is_echo():
-		_press_dir(-1)
+		_request_dir(-1)
 		get_viewport().set_input_as_handled()
 	elif event.is_action_released(InputActions.RIGHT):
 		if _hold_dir == 1:
@@ -168,35 +172,50 @@ func _process(delta: float) -> void:
 # Input
 # ---------------------------------------------------------------------------
 
-func _press_dir(dir: int) -> void:
-	if _mode == SpinMode.SETTLE:
-		_kill_tween()
-		_snap_visual_to_selected()
-		_mode = SpinMode.IDLE
-
-	# Opposite direction while moving -> ease-in the other way
-	if _mode in [SpinMode.HOLD, SpinMode.TAP] and _dir != 0 and dir != _dir:
-		_start_reverse(dir)
+func _request_dir(dir: int) -> void:
+	if _mode == SpinMode.TRANSITION:
 		return
-
-	_holding = true
-	_hold_dir = dir
-
-	# Already chasing this way: keep the hold ramp (do not treat extra taps as mash)
+	# Already chasing this way — keep the hold ramp.
 	if _mode == SpinMode.HOLD and dir == _dir:
+		_holding = true
+		_hold_dir = dir
 		return
+	if _is_spin_busy():
+		_pending_action = PendingAction.SPIN
+		_pending_dir = dir
+		if _mode == SpinMode.HOLD:
+			_begin_settle_for_pending()
+		return
+	_execute_dir(dir)
+
+
+func _execute_dir(dir: int) -> void:
+	if _mode != SpinMode.IDLE:
+		return
+
+	var still_held := (
+		(dir > 0 and Input.is_action_pressed(InputActions.RIGHT))
+		or (dir < 0 and Input.is_action_pressed(InputActions.LEFT))
+	)
+	_holding = still_held
+	_hold_dir = dir if still_held else 0
 
 	# Same-side taps stay TAP (1 / 2 / 3 slots). Hold only comes from keeping the key down.
 	var window_open := _tap_window_left > 0.0
 	var continue_same := (
-		(_mode == SpinMode.TAP and dir == _dir)
-		or (_mode == SpinMode.IDLE and window_open and dir == _dir and _tap_count > 0)
+		window_open and dir == _dir and _tap_count > 0
 	)
 	_tap_window_left = tap_window
 
 	if continue_same:
 		_boost_look_ahead_from_tap()
+		_tap_origin_index = selected_index
+		_tap_origin_rotation = carousel.rotation + _angled(
+			carousel.rotation, _slot_rotation(_tap_origin_index)
+		)
+		_dir = dir
 		_retarget_tap()
+		_set_selected(posmod(_tap_origin_index + _dir * _look_ahead, _item_count))
 		_play_tap_spin()
 		return
 
@@ -347,30 +366,6 @@ func _settle_to_index(final_index: int) -> void:
 	_park_on_slot(final_index)
 
 
-func _start_reverse(new_dir: int) -> void:
-	_kill_tween()
-	_holding = true
-	_hold_dir = new_dir
-	_hold_time = 0.0
-	_reverse_pending_dir = 0
-
-	var nearest := _index_from_angle(carousel.rotation)
-	var base := carousel.rotation + _angled(carousel.rotation, _slot_rotation(nearest))
-	carousel.rotation = base
-	_set_selected(nearest)
-	_dir = new_dir
-	_tap_count = 1
-	_look_ahead = 1
-	_tap_origin_index = nearest
-	_tap_origin_rotation = base
-	_retarget_tap()
-	_tap_window_left = tap_window
-	if Input.is_action_pressed(InputActions.LEFT) or Input.is_action_pressed(InputActions.RIGHT):
-		_enter_hold_chase(new_dir)
-	else:
-		_play_tap_spin()
-
-
 func _park_on_slot(final_index: int) -> void:
 	_kill_tween()
 	_set_selected(final_index)
@@ -386,6 +381,7 @@ func _park_on_slot(final_index: int) -> void:
 		_tap_count = 0
 	_apply_selection_visuals()
 	_refresh_selection_label()
+	_flush_pending_action()
 
 
 func _set_selected(index: int) -> void:
@@ -514,18 +510,69 @@ func _reset_spin() -> void:
 	_hold_dir = 0
 	_hold_time = 0.0
 	_tap_window_left = 0.0
-	_reverse_pending_dir = 0
+	_pending_action = PendingAction.NONE
+	_pending_dir = 0
 
 
-func _on_confirm() -> void:
-	if _mode == SpinMode.SETTLE or _mode == SpinMode.REVERSE_BOUNCE or _mode == SpinMode.TRANSITION:
-		return
-	if _mode == SpinMode.TAP:
-		carousel.rotation = _tap_target_rotation
-		_settle_to_index(posmod(_tap_origin_index + _dir * _look_ahead, _item_count))
-		return
+func _is_spin_busy() -> bool:
+	return _mode in [
+		SpinMode.TAP,
+		SpinMode.HOLD,
+		SpinMode.SETTLE,
+		SpinMode.REVERSE_BOUNCE,
+	]
+
+
+## Stop hold so TAP can park; if already HOLD, settle to north now.
+func _begin_settle_for_pending() -> void:
+	_holding = false
+	_hold_dir = 0
 	if _mode == SpinMode.HOLD:
 		_settle_to_nearest()
+
+
+func _flush_pending_action() -> void:
+	if _pending_action == PendingAction.NONE:
+		return
+	if _mode != SpinMode.IDLE:
+		return
+	var action := _pending_action
+	var pending_dir := _pending_dir
+	_pending_action = PendingAction.NONE
+	_pending_dir = 0
+	match action:
+		PendingAction.CONFIRM:
+			_execute_confirm()
+		PendingAction.BACK:
+			_execute_back()
+		PendingAction.SPIN:
+			_execute_dir(pending_dir)
+		_:
+			pass
+
+
+func _request_confirm() -> void:
+	if _mode == SpinMode.TRANSITION:
+		return
+	if _is_spin_busy():
+		_pending_action = PendingAction.CONFIRM
+		_begin_settle_for_pending()
+		return
+	_execute_confirm()
+
+
+func _request_back() -> void:
+	if _mode == SpinMode.TRANSITION:
+		return
+	if _is_spin_busy():
+		_pending_action = PendingAction.BACK
+		_begin_settle_for_pending()
+		return
+	_execute_back()
+
+
+func _execute_confirm() -> void:
+	if _mode != SpinMode.IDLE:
 		return
 
 	# IDLE: confirm north item (locked → denied anim, no enter)
@@ -567,15 +614,9 @@ func _play_denied_on_selected() -> void:
 		item.play_denied()
 
 
-func _on_back() -> void:
-	if _mode == SpinMode.TRANSITION:
+func _execute_back() -> void:
+	if _mode != SpinMode.IDLE:
 		return
-	# Stop spin and leave the current circle
-	_holding = false
-	_hold_dir = 0
-	_kill_tween()
-	if _mode in [SpinMode.TAP, SpinMode.HOLD, SpinMode.SETTLE, SpinMode.REVERSE_BOUNCE]:
-		_snap_visual_to_selected()
 
 	if stage == Stage.PHASE:
 		# ZOOM OUT of Select Phase, then World with DIVE OUT (from inside camera)
