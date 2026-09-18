@@ -6,14 +6,14 @@ extends Node
 ## Set to false for release builds.
 const IS_DEV_BUILD: bool = true
 
-const SCENE_MAIN_MENU := "res://scenes/ui/MainMenu.tscn"
-const SCENE_GAME := "res://scenes/Game.tscn"
-const SCENE_UNDER_CONSTRUCTION := "res://scenes/ui/UnderConstruction.tscn"
-const SCENE_LEVEL_SELECT := "res://scenes/ui/LevelSelect.tscn"
-const SCENE_SOUND := "res://scenes/ui/UnderConstruction.tscn"
-const SCENE_GRAPHIC := "res://scenes/ui/UnderConstruction.tscn"
-const SCENE_CONTROLS := "res://scenes/ui/ControlSettings.tscn"
-const SCENE_DEBUGGER := "res://scenes/ui/UnderConstruction.tscn"
+const SCENE_MAIN_MENU := "res://scenes/app/MainMenu.tscn"
+const SCENE_GAME := "res://scenes/run/Game.tscn"
+const SCENE_UNDER_CONSTRUCTION := "res://scenes/app/UnderConstruction.tscn"
+const SCENE_LEVEL_SELECT := "res://scenes/select/LevelSelect.tscn"
+const SCENE_SOUND := "res://scenes/app/UnderConstruction.tscn"
+const SCENE_GRAPHIC := "res://scenes/app/UnderConstruction.tscn"
+const SCENE_CONTROLS := "res://scenes/app/ControlSettings.tscn"
+const SCENE_DEBUGGER := "res://scenes/app/UnderConstruction.tscn"
 
 var current_world: int = 0
 var current_phase: int = 0

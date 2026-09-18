@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="cubu-dash"
-run/main_scene="res://scenes/ui/MainMenu.tscn"
+run/main_scene="res://scenes/app/MainMenu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cyyh2ic8t5w4a"]
 
-[ext_resource type="Script" uid="uid://d1erpokskr0cu" path="res://scenes/ui/level_select.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://d1erpokskr0cu" path="res://scenes/select/level_select.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://bftlihwdfu6iy" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_stage"]

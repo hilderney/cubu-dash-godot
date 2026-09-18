@@ -3,7 +3,7 @@ extends Node
 ## Applies the exclusive input scheme to Godot's InputMap and virtual pad.
 
 const SAVE_KEY := "input"
-const TOUCH_SCENE := preload("res://scenes/ui/TouchControls.tscn")
+const TOUCH_SCENE := preload("res://scenes/hud/TouchControls.tscn")
 
 signal scheme_changed(scheme: InputScheme.Id)
 signal bindings_changed

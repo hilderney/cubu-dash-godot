@@ -18,7 +18,7 @@ enum PendingAction { NONE, CONFIRM, BACK, SPIN }
 ## How a select circle enters after a transition.
 enum EnterAnim { NONE, ZOOM_IN, DIVE_OUT }
 
-const ITEM_SCENE := preload("res://scenes/ui/CarouselItem.tscn")
+const ITEM_SCENE := preload("res://scenes/select/CarouselItem.tscn")
 const MAX_LOOK: int = 3
 const HOLD_LOOK_2: float = 0.80
 const HOLD_LOOK_3: float = 1.80

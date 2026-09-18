@@ -25,7 +25,14 @@ Gameplay and UI share the same actions: `left`, `right`, `up`, `down`, `btn_a`, 
 autoload/   GameManager, InputManager, SaveLoad, EventBus, Audio, stats
 input/      InputPort + adapters + factory
 save/       SavePort + file adapter + factory
-scenes/     Game, Player, UI (menu, select, pause, touch, settings)
+audio/      Placeholder for future AudioPort stack
+stages/     Placeholder for future world/phase content
+scenes/
+  app/      MainMenu, ControlSettings, UnderConstruction
+  select/   LevelSelect, CarouselItem
+  run/      Game, Player, PauseMenu
+  hud/      TouchControls
+assets/     Fonts (and future art/audio assets)
 ```
 
 Project conventions (language, architecture, animation bounce, select-ring feel) live in [RULES.md](RULES.md).

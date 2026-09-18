@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://cj571q7jq8aj8"]
 
-[ext_resource type="PackedScene" uid="uid://cj76gix147jjj" path="res://scenes/Player.tscn" id="1_ibkli"]
-[ext_resource type="Script" path="res://scenes/game.gd" id="2_game"]
-[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="3_pause"]
+[ext_resource type="PackedScene" uid="uid://cj76gix147jjj" path="res://scenes/run/Player.tscn" id="1_ibkli"]
+[ext_resource type="Script" path="res://scenes/run/game.gd" id="2_game"]
+[ext_resource type="PackedScene" path="res://scenes/run/PauseMenu.tscn" id="3_pause"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4yr2n"]
 size = Vector2(4000, 73)
