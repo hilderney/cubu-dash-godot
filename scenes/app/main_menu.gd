@@ -90,5 +90,5 @@ func _on_controls() -> void:
 
 
 func _on_debugger() -> void:
-	# TODO: AUDIO — UI open debugger
-	GameManager.open_under_construction("Debugger")
+	# TODO: AUDIO — UI open debugger / dev lab
+	GameManager.go_dev_lab()

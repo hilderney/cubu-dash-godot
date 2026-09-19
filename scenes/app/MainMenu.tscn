@@ -1,66 +1,7 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene format=3 uid="uid://bx5col02ycuom"]
 
-[ext_resource type="Script" path="res://scenes/app/main_menu.gd" id="1_script"]
-[ext_resource type="FontFile" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-bg_color = Color(0.0313726, 0.12549, 0.196078, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.305882, 0.803922, 0.768627, 1)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-content_margin_left = 20
-content_margin_top = 14
-content_margin_right = 20
-content_margin_bottom = 14
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_size = 0
-shadow_offset = Vector2(4, 4)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(1, 0.419608, 0.207843, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(1, 0.901961, 0.427451, 1)
-content_margin_left = 20
-content_margin_top = 14
-content_margin_right = 20
-content_margin_bottom = 14
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_offset = Vector2(4, 4)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-bg_color = Color(1, 0.901961, 0.427451, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.0313726, 0.12549, 0.196078, 1)
-content_margin_left = 20
-content_margin_top = 14
-content_margin_right = 20
-content_margin_bottom = 14
-shadow_offset = Vector2(1, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_focus"]
-draw_center = false
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(1, 0.901961, 0.427451, 1)
-content_margin_left = 20
-content_margin_top = 14
-content_margin_right = 20
-content_margin_bottom = 14
-shadow_offset = Vector2(4, 4)
+[ext_resource type="Script" uid="uid://cxqdq3qbfcob7" path="res://scenes/app/main_menu.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://bftlihwdfu6iy" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font = ExtResource("2_font")
@@ -80,12 +21,66 @@ shadow_size = 3
 shadow_color = Color(0, 0, 0, 0.6)
 shadow_offset = Vector2(2, 2)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 14.0
+bg_color = Color(0.0313726, 0.12549, 0.196078, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.305882, 0.803922, 0.768627, 1)
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_offset = Vector2(4, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 14.0
+bg_color = Color(1, 0.901961, 0.427451, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.0313726, 0.12549, 0.196078, 1)
+shadow_offset = Vector2(1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 14.0
+bg_color = Color(1, 0.419608, 0.207843, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.901961, 0.427451, 1)
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_offset = Vector2(4, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_focus"]
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 14.0
+draw_center = false
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.901961, 0.427451, 1)
+shadow_offset = Vector2(4, 4)
+
 [sub_resource type="LabelSettings" id="LabelSettings_version"]
 font = ExtResource("2_font")
 font_size = 10
 font_color = Color(0.305882, 0.803922, 0.768627, 0.7)
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=2036369549]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -94,7 +89,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=1141098697]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -104,39 +99,39 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.0431373, 0.113725, 0.211765, 1)
 
-[node name="StripeBand" type="ColorRect" parent="."]
+[node name="StripeBand" type="ColorRect" parent="." unique_id=960370028]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -120.0
-offset_top = -40.0
-offset_right = 1480.0
-offset_bottom = 120.0
+offset_left = -275.0
+offset_top = 49.999996
+offset_right = 1325.0
+offset_bottom = 210.0
 rotation = -0.174533
 mouse_filter = 2
 color = Color(1, 0.419608, 0.207843, 0.22)
 
-[node name="StripeBand2" type="ColorRect" parent="."]
+[node name="StripeBand2" type="ColorRect" parent="." unique_id=1295248188]
 layout_mode = 0
-offset_left = -80.0
-offset_top = 560.0
-offset_right = 1500.0
-offset_bottom = 700.0
+offset_left = -90.00001
+offset_top = 726.0
+offset_right = 1490.0
+offset_bottom = 866.0
 rotation = -0.122173
 mouse_filter = 2
 color = Color(0.305882, 0.803922, 0.768627, 0.16)
 
-[node name="CubeA" type="ColorRect" parent="."]
+[node name="CubeA" type="ColorRect" parent="." unique_id=1896701354]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 980.0
-offset_top = 120.0
-offset_right = 1060.0
-offset_bottom = 200.0
+offset_left = 1015.0
+offset_top = 140.0
+offset_right = 1095.0
+offset_bottom = 220.0
 pivot_offset = Vector2(40, 40)
 mouse_filter = 2
 color = Color(1, 0.419608, 0.207843, 1)
 
-[node name="CubeB" type="ColorRect" parent="."]
+[node name="CubeB" type="ColorRect" parent="." unique_id=261118739]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1080.0
@@ -147,18 +142,18 @@ pivot_offset = Vector2(32, 32)
 mouse_filter = 2
 color = Color(1, 0.901961, 0.427451, 1)
 
-[node name="CubeC" type="ColorRect" parent="."]
+[node name="CubeC" type="ColorRect" parent="." unique_id=600631410]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 90.0
-offset_top = 260.0
-offset_right = 142.0
-offset_bottom = 312.0
+offset_left = 140.0
+offset_top = 345.0
+offset_right = 192.0
+offset_bottom = 397.0
 pivot_offset = Vector2(26, 26)
 mouse_filter = 2
 color = Color(0.305882, 0.803922, 0.768627, 1)
 
-[node name="Center" type="VBoxContainer" parent="."]
+[node name="Center" type="VBoxContainer" parent="." unique_id=173755593]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -174,117 +169,117 @@ grow_vertical = 2
 theme_override_constants/separation = 28
 alignment = 1
 
-[node name="TitleBlock" type="VBoxContainer" parent="Center"]
+[node name="TitleBlock" type="VBoxContainer" parent="Center" unique_id=372889472]
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="Center/TitleBlock"]
+[node name="TitleLabel" type="Label" parent="Center/TitleBlock" unique_id=269995359]
 unique_name_in_owner = true
 layout_mode = 2
 text = "CUBU DASH"
 label_settings = SubResource("LabelSettings_title")
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="Center/TitleBlock"]
+[node name="SubtitleLabel" type="Label" parent="Center/TitleBlock" unique_id=324455153]
 unique_name_in_owner = true
 layout_mode = 2
 text = "RETRO FUN RUN"
 label_settings = SubResource("LabelSettings_sub")
 horizontal_alignment = 1
 
-[node name="MenuBox" type="VBoxContainer" parent="Center"]
+[node name="MenuBox" type="VBoxContainer" parent="Center" unique_id=1620608976]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="BtnStart" type="Button" parent="Center/MenuBox"]
+[node name="BtnStart" type="Button" parent="Center/MenuBox" unique_id=1309505750]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_color = Color(1, 0.901961, 0.427451, 1)
-theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
-theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_colors/font_focus_color = Color(1, 0.901961, 0.427451, 1)
+theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
+theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
 text = "START GAME"
 
-[node name="BtnSound" type="Button" parent="Center/MenuBox"]
+[node name="BtnSound" type="Button" parent="Center/MenuBox" unique_id=829618112]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_color = Color(1, 0.901961, 0.427451, 1)
-theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
-theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_colors/font_focus_color = Color(1, 0.901961, 0.427451, 1)
+theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
+theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
 text = "SOUND"
 
-[node name="BtnGraphic" type="Button" parent="Center/MenuBox"]
+[node name="BtnGraphic" type="Button" parent="Center/MenuBox" unique_id=187004449]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_color = Color(1, 0.901961, 0.427451, 1)
-theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
-theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_colors/font_focus_color = Color(1, 0.901961, 0.427451, 1)
+theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
+theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
 text = "GRAPHIC"
 
-[node name="BtnControls" type="Button" parent="Center/MenuBox"]
+[node name="BtnControls" type="Button" parent="Center/MenuBox" unique_id=2023194809]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_color = Color(1, 0.901961, 0.427451, 1)
-theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
-theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_colors/font_focus_color = Color(1, 0.901961, 0.427451, 1)
+theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
+theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
 text = "CONTROL SETTINGS"
 
-[node name="BtnDebugger" type="Button" parent="Center/MenuBox"]
+[node name="BtnDebugger" type="Button" parent="Center/MenuBox" unique_id=342773556]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_color = Color(1, 0.901961, 0.427451, 1)
-theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
-theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_colors/font_focus_color = Color(1, 0.901961, 0.427451, 1)
+theme_override_colors/font_pressed_color = Color(0.0313726, 0.12549, 0.196078, 1)
+theme_override_colors/font_hover_color = Color(0.0313726, 0.12549, 0.196078, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
 text = "DEBUGGER"
 
-[node name="VersionLabel" type="Label" parent="."]
+[node name="VersionLabel" type="Label" parent="." unique_id=252105595]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 3

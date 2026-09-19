@@ -121,3 +121,4 @@ Tune with `transition_bounce_zoom`, `transition_bounce_pixels`, `transition_boun
 
 - Player X is locked. The world scrolls; dash speeds that scroll up for a short burst.
 - Jump squash/stretch and land squash use a short overshoot, then rest — same bounce language as UI dock.
+- **Hitstop / freeze frame** on meaningful impacts (optional camera rumble). Tiers: **Light** (e.g. double-jump land), **Medium** (dash breaks object), **Strong** (boss defeat / hard wall). Spec: `.docs/hitstop.md`.
